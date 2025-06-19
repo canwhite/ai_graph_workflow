@@ -1,62 +1,67 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-// import Link from "next/link";
-// import { useState, useEffect } from "react";
-// import { ethers } from "ethers";
-// import { Button } from "@/components/ui/button";
-// import useEvent from "@/hooks/useEvent";
-import { useCounter } from "@/store/index";
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { LiteGraph, LGraph, LGraphCanvas } from "litegraph.js";
+import { registerNodes } from "@/lib/registerNodes";
+import { PromptNode } from "@/lib/nodes/PromptNode";
+import { DataProcessorNode } from "@/lib/nodes/DataProcessorNode";
+import { OutputNode } from "@/lib/nodes/OutputNode";
+import "litegraph.js/css/litegraph.css";
 
-// declare let window: any;
+export default function Home() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [apiKey, setApiKey] = useState("");
+  const graphRef = useRef<LGraph | null>(null);
 
-const Home: NextPage = () => {
-  const { count, increment, decrement, reset } = useCounter();
+  useEffect(() => {
+    // Initialize graph
+    const graph = new LGraph();
+    graphRef.current = graph;
+
+    const canvas = new LGraphCanvas(canvasRef.current!, graph);
+
+    // Register custom nodes
+    registerNodes();
+
+    // Example node setup using direct instantiation
+    const promptNode = new PromptNode();
+    promptNode.pos = [100, 100];
+    promptNode.properties.apiKey = apiKey;
+    graph.add(promptNode);
+
+    const processorNode = new DataProcessorNode();
+    processorNode.pos = [400, 100];
+    graph.add(processorNode);
+
+    const outputNode = new OutputNode();
+    outputNode.pos = [700, 100];
+    graph.add(outputNode);
+
+    // Connect nodes
+    promptNode.connect(0, processorNode, 0);
+    processorNode.connect(0, outputNode, 0);
+
+    // Start graph
+    graph.start();
+
+    return () => {
+      graph.stop();
+    };
+  }, [apiKey]);
+
   return (
-    <div className="flex flex-col items-center  w-full h-full">
-      <Head>
-        <title>My DAPP</title>
-      </Head>
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full">
-        <h1 className="text-3xl font-bold mb-4 text-center">Counter</h1>
-
-        <div className="text-center mb-6">
-          <span className="text-2xl font-semibold">Current Count:</span>
-          <span
-            className={`ml-2 text-4xl font-bold ${
-              count > 0
-                ? "text-green-600"
-                : count < 0
-                ? "text-red-600"
-                : "text-gray-800"
-            }`}
-          >
-            {count}
-          </span>
-        </div>
-
-        <div className="flex gap-4 justify-center">
-          <button
-            onClick={decrement}
-            className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
-            Decrement
-          </button>
-          <button
-            onClick={reset}
-            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-          >
-            Reset
-          </button>
-          <button
-            onClick={increment}
-            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Increment
-          </button>
-        </div>
+    <div className="flex flex-col h-screen">
+      <div className="p-4 bg-gray-100">
+        <input
+          type="password"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter OpenAI API Key"
+          className="p-2 border rounded"
+        />
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <canvas ref={canvasRef} className="w-full h-full border" />
       </div>
     </div>
   );
-};
-
-export default Home;
+}
