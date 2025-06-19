@@ -1,0 +1,47 @@
+.litegraph {
+  font-family: sans-serif;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #222;
+  background-image: linear-gradient(#333 1px, transparent 1px),
+    linear-gradient(90deg, #333 1px, transparent 1px);
+  background-size: 50px 50px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.litegraph .content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.litegraph .lgraphcanvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 节点样式 */
+.litegraph .node {
+  position: absolute;
+  box-sizing: border-box;
+  background: #333;
+  border: 2px solid #555;
+  border-radius: 5px;
+  color: #eee;
+  cursor: move;
+  min-width: 180px;
+  min-height: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s;
+}
+
+.litegraph .node.selected {
+  border-color: #9ecaed;
+  box-shadow: 0 0 10px #9ecaed;
+}
+
+/* 其他必要样式... */
